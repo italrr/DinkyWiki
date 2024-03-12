@@ -14,17 +14,15 @@
                 textGeneric: "#fff"
             });
     
-            window.addEventListener("load", (event) => {
-                setTimeout(() => {
-                    miniwiki.registerArticles([
-                        'home',
-                        'bear',
-                        'bird'
-                    ]).then(function(){
-                        miniwiki.init(document.getElementById("body"));
-                    });                    
-                }, 500);
-            });
+            setTimeout(() => {
+                miniwiki.registerArticles([
+                    'home',
+                    'bear',
+                    'bird'
+                ]).then(function(){
+                    miniwiki.init(document.getElementById("body"));
+                });                    
+            }, 500);
     
         </script>        
 

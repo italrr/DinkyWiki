@@ -49,6 +49,7 @@ const MiniWiki = function(title, type, theme){
                             resolve();
                         }
                     };
+                    script.setAttribute("type", "text/javascript");
                     script.setAttribute("src", `./articles/${list[i]}.js`);
                     head.appendChild(script);
                 }
@@ -171,7 +172,6 @@ const MiniWiki = function(title, type, theme){
             // Table of contents
             if(Object.keys(me.currentArticle.sections).length > 0){
                 let list = "";
-                const url = location.protocol + '//' + location.host + location.pathname;    
                 let n = 0;
                 for(let i in me.currentArticle.sections){
                     const sec = i;
