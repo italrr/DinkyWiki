@@ -7,17 +7,19 @@
         <script src="miniwiki.js"></script>
         <script type="text/javascript">
             
-            const miniwiki = MiniWiki("CARBON RIFT LORE WIKI", MiniWikiTools.WIKI_TYPE.TYPICAL, {
-                topbarbackground: '#170041',
-                navegationBackground: '#20005c',
-                bodyBackground: '#26006c',
+            const miniwiki = MiniWiki("The Animal Wiki", MiniWikiTools.WIKI_TYPE.TYPICAL, {
+                topbarbackground: '#201229',
+                navegationBackground: '#1d0c29',
+                bodyBackground: '#0c0c0c',
                 textGeneric: "#fff"
             });
     
             window.addEventListener("load", (event) => {
                 setTimeout(() => {
                     miniwiki.registerArticles([
-                        'home'
+                        'home',
+                        'bear',
+                        'bird'
                     ]).then(function(){
                         miniwiki.init(document.getElementById("body"));
                     });                    
