@@ -13,7 +13,7 @@ miniwiki.registerArticle("Bear Story", `
                 [!s=2 As the days went by, Bartholomew explored the forest feast. He cracked open hazelnuts with his strong teeth, the sweet crunch a delightful change. He even discovered a beehive (from a safe distance!), enjoying the golden honey dripping on his fur.]
                 [!s=2 Bartholomew never gave up his love for salmon, but now, his meals were an exciting adventure. He learned that a varied diet kept him strong and healthy, and every day brought a new delicious surprise. From then on, Bartholomew the bear, with a happy belly and a curious spirit, continued to explore the wonderful flavors his forest home had to offer.]
             ]
-            [!s=2 [%card-img title:'Bear' width:'20' src:img/bear.png%]]
+            [!s=2 [%card-img title:'Bear' width:'20' src:articles/img/bear.png%]]
         ]
 
     `,

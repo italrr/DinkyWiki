@@ -15,7 +15,7 @@ miniwiki.registerArticle("Bird Story", `
                 [!s=2 Hesitantly, he pecked at a plump red berry. It burst in his mouth, a sweet explosion of flavor unlike anything he'd ever tasted. He chirped with delight, his tiny body buzzing with excitement.]
                 [!s=2 From that day on, Pip became a more adventurous eater. He still enjoyed his daily dose of protein from bugs, but he also feasted on juicy berries, crunchy seeds, and even the occasional sweet flower petal. His world became a delicious smorgasbord, and Pip, the once-ordinary Bug Patroller, became a true explorer of the garden's tasty treasures.]
             ]
-            [!s=2 [%card-video title:'Bird' width:'20' src:video/bird.webm%]]
+            [!s=2 [%card-video title:'Bird' width:'20' src:articles/video/bird.webm%]]
         ]
         [!s=2]
         %subtitle label:'Who?'%

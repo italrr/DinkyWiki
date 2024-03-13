@@ -20,7 +20,34 @@ const MiniWikiTools = {
             }
             result += c;
         }
-
+        return result;
+    },
+    removeExtraSpaces: function(input){
+        let result = "";
+        let lc = "";
+        for(let i = 0; i < input.length; ++i){
+            const c = input.charAt(i)
+            if(c == " " && lc == " "){
+                continue;
+            }
+            result += c;
+            lc = c;
+        }
+        return result;
+    },
+    removeSpecialChars: function(input){
+        const list = [
+            "!", "@", "'", "\"","`", "#", "%", "*",
+            "&", "^", "[","]", "{", "}", "|", "(",
+            ")", "-", "=", "+", ";", ".", ",",
+            "/", "\\", "?", "$", "<", ">", "–"
+        ];
+        let result = input;
+        for(let i = 0; i < list.length; ++i){
+            // probably kind of slow
+            // will do for now
+            result = result.replaceAll(list[i], "");
+        }
         return result;
     }
 };
@@ -61,6 +88,18 @@ const MiniWiki = function(title, type, theme){
             me.body = body;
             console.log(`MiniWiki v${MINIWIKI_VERSION[0]}.${MINIWIKI_VERSION[1]}.${MINIWIKI_VERSION[2]}`);
             
+            miniwiki.registerArticle("404: Not found", `
+                    [!tn=2 !s=5 !j
+                        [!f][Article not found][!f]
+                    ]
+                `,
+                [
+                    "404"
+                ],
+                null,
+                "404"
+            );
+
             const tbTitle = document.getElementById("tb-title");
             tbTitle.innerHTML = title;
 
@@ -108,41 +147,49 @@ const MiniWiki = function(title, type, theme){
                 const artId = urlParams.get("article");
                 const refAt = urlParams.get("at");
     
-                if(artId){
-                    const article = me.getArticleByLink(artId);
-                    me.navigateTo(article.link, skipPush);
-                }else{
-                    // There should be a home article
-                    me.navigateTo("home", skipPush);
-                }
+                me.navigateTo(artId, refAt, skipPush);
             };
 
             refreshNav();
 
             window.addEventListener("popstate", (event) => {
                 const urlParams = new URLSearchParams(window.location.search);
-                me.navigateTo(urlParams.get("article"), true);
+                me.navigateTo(urlParams.get("article"), urlParams.get("at"), true);
             });
                      
 
         },
-        navigateTo: function(link, skipPush = false){
+        navigateTo: function(link, at, skipPush = false){
             const me = this;
             if(!me.articles.hasOwnProperty(link)){
-                console.error(`Article ${link} does not exist`);
-                // TODO: navigate to a 404 window
+                const art404 = me.getArticleByLink("404");
+                if(!art404){
+                    console.error(`There's no 404 article`);
+                }
+                me.navigateTo("404", null, true);
                 return;
             }
             const article = me.articles[link];
             me.currentArticle = article;
             const url = location.protocol + '//' + location.host + location.pathname;           
             document.title = `${article.title} - ${me.title}`;
-            me.addHistory(link);
+            if(link != "404"){
+                me.addHistory(link);
+            }
             if(!skipPush){
-                history.pushState(history.state, "", `${url}?article=${link}`);
+                history.pushState(history.state, "", `${url}?article=${link}${at && at != "null" ? `&at=${at}`: ''}`);
             }
             me.renderTo(me.mainBody, article, false);
             me.refreshNavBar();
+            if(at){
+                const tokens = at.split("#");
+                const title = document.getElementById(`${tokens[0]}-${tokens[1]}`);
+                if(title){
+                    setTimeout(function(){
+                        title.scrollIntoView();
+                    }, 200);
+                }
+            }
         },
         addHistory: function(entry){
             const me = this;
@@ -150,12 +197,13 @@ const MiniWiki = function(title, type, theme){
                 me.history.splice(me.history.indexOf(entry), 1);
             }
             me.history.push(entry);
+            me.history.reverse();
             localStorage.setItem("history", JSON.stringify(me.history));
         },
         loadHistory: function(){
             const me = this;
             const list = localStorage.getItem("history");
-            me.history = list ? JSON.parse(list) : [];
+            me.history = list ? JSON.parse(list).reverse() : [];
         },
         refreshNavBar: function(){
             const me = this;
@@ -168,9 +216,8 @@ const MiniWiki = function(title, type, theme){
             target.style.fontWeight = "normal";
 
             let html = "";
-            console.log(me.currentArticle.sections);
             // Table of contents
-            if(Object.keys(me.currentArticle.sections).length > 0){
+            if(me.currentArticle && Object.keys(me.currentArticle.sections).length > 0){
                 let list = "";
                 let n = 0;
                 for(let i in me.currentArticle.sections){
@@ -197,11 +244,11 @@ const MiniWiki = function(title, type, theme){
                     ++n;
                 }
                 html +=  
-                        `<div>
-                            <div style="font-weight: bold; width: 100%; text-align:center; margin-top:2rem;">
+                        `<div style="margin-bottom:3rem;">
+                            <div style="font-weight: bold; width: 100%; color:${me.theme.navegationBackground}; text-align:center; background-color:${me.theme.textGeneric};">
                                 <div>TABLE OF CONTENTS</div>
                             </div>
-                            <div style="display: flex; flex-direction:row; margin-top: 2rem;">
+                            <div style="display: flex; flex-direction:row; margin-top: 1rem;">
                                 <div style="flex:1"></div>
                                 <div style="width:50%;">
                                     ${list}
@@ -212,10 +259,60 @@ const MiniWiki = function(title, type, theme){
                     
             }
 
-            // hierarchy
+            // Hierarchy
+            if(me.currentArticle && Object.keys(me.currentArticle.subArticles).length > 0){
+                let subArts = "";
+                let j = 0;
+                for(let i in me.currentArticle.subArticles){
+                    const sub = me.currentArticle.subArticles[i];
+                    subArts += `
+                        <div style="width: 100%; font-size:0.8em;">
+                            <div style="margin-left: 1rem; display:inline-block;">
+                                ${me.generateLink(`${(++j)}. ${sub.title}`, sub.link, null)}
+                            </div>
+                        </div>                    
+                    `;
+                }
+                html +=  
+                `<div style="margin-bottom:3rem;">
+                    <div style="font-size: 1.5rem; font-weight: bold; width: 100%; color:${me.theme.navegationBackground}; text-align:center; background-color:${me.theme.textGeneric};">
+                        <div>${me.currentArticle.title.toUpperCase()}</div>
+                    </div>
+                    <div style="display: flex; flex-direction:row; margin-top: 1rem;">
+                        <div style="flex:1"></div>
+                        <div style="width:50%;">
+                            ${subArts}
+                        </div>
+                        <div style="flex:1"></div>
+                    </div>
+                </div>`
+            }
 
-            // history
-
+            // History
+            if(me.history && me.history.length > 0){
+                let historyList = "";
+                for(let i = 0; i < me.history.length; ++i){
+                    const article = me.getArticleByLink(me.history[i]);
+                    if(!article) continue;
+                    historyList += `<div style="margin-bottom:0.25rem; text-align:left; font-size:0.8em;">
+                            ${i+1}. ${me.generateLink(article.title, me.history[i], null)}
+                        </div>
+                    `;                
+                }
+                html +=  
+                `<div>
+                    <div style="font-size: 1.5rem; font-weight: bold; width: 100%; color:${me.theme.navegationBackground}; text-align:center; background-color:${me.theme.textGeneric};">
+                        <div>HISTORY</div>
+                    </div>
+                    <div style="display: flex; flex-direction:row; margin-top: 1rem;">
+                        <div style="flex:1"></div>
+                        <div style="width:50%;">
+                            ${historyList}
+                        </div>
+                        <div style="flex:1"></div>
+                    </div>
+                </div>`
+            }
 
             target.innerHTML = html;
         },
@@ -240,6 +337,7 @@ const MiniWiki = function(title, type, theme){
                 head: null,
                 sections: [],
                 html: null,
+                literal: [],
                 subArticles: {}
             };
             article.html = me.parseToHTML(article.contents, article);
@@ -340,7 +438,7 @@ const MiniWiki = function(title, type, theme){
         },
         generateLink: function(label, link, at){
             const url = location.protocol + '//' + location.host + location.pathname;
-            return `<a href="${url}?article=${link}${at ? `&at=${at}` : ''}" onClick="(function(){ miniwiki.navigateTo('${link}'); return false; })();return false;" >${label}</a>`;
+            return `<a href="${url}?article=${link}${at ? `&at=${at}` : ''}" onClick="(function(){ miniwiki.navigateTo('${link}', '${at}'); return false; })();return false;" >${label}</a>`;
         },
         parseToHTML: function(_input, root, defaultBlock = "width:100%; display:flex; flex-direction:row;"){
             const me = this;
@@ -352,6 +450,7 @@ const MiniWiki = function(title, type, theme){
             if(root){
                 root.sections = {};
             }
+            let tempLiteral = "";
             let currentTitle = "";
             let currentSubTitle = "";            
             for(let i = 0; i < input.length; ++i){
@@ -408,6 +507,7 @@ const MiniWiki = function(title, type, theme){
                         } break;
                         case "link": {
                             str += me.generateLink(params.label, params.id);
+                            if(root) root.literal += `${params.label} `;
                         } break;
                         case "subtitle":
                         case "title": {
@@ -419,7 +519,7 @@ const MiniWiki = function(title, type, theme){
                                 currentSubTitle = params.label;
                                 currentTitle = params.label;
                             }
-                            str += `<div style="${token == "subtitle" ? 'font-weight:bold;' : `border-bottom: 0.25rem solid ${me.theme.textGeneric};`}">
+                            str += `<div id="${currentTitle.replace(' ', '_')}-${currentSubTitle.replace(' ', '_')}" style="${token == "subtitle" ? 'font-weight:bold;' : `border-bottom: 0.25rem solid ${me.theme.textGeneric};`}">
                                 <div style="font-size: ${fs}rem;">${params.label}</div>
                             </div>`;
                             if(root){
@@ -428,9 +528,11 @@ const MiniWiki = function(title, type, theme){
                                 }
                                 root.sections[currentTitle].push(currentSubTitle);
                             }
+                            if(root) root.literal += `${params.label} `;
                         } break;                        
                         case "url": {
                             str += `<a href="${params.url}">${params.label}</a>`;
+                            if(root) root.literal += `${params.label} `;
                         } break;
                         case "card-video":
                         case "card-img": {
@@ -453,6 +555,8 @@ const MiniWiki = function(title, type, theme){
                                         ${me.parseToHTML(params.title, null, `width:100%; display:inline-block;`)}
                                     </div>
                                 </div>`;
+
+                            if(root) root.literal += `${params.title} `;
                         } break;                        
                         case "img": {
                             str += `<img ${me.generateDefaultParams(params, false)} src="./${params.src}"></img>`;
@@ -578,11 +682,112 @@ const MiniWiki = function(title, type, theme){
                 if(c == " " && lastChar == " "){
                     continue;
                 }else{
+                    tempLiteral += c;
                     str += c;
                     lastChar = c;
                 }
             }
+            if(root) root.literal += `${tempLiteral} `;
             return str;
+        },
+        search: function(input){
+            const me = this;
+            return new Promise(function(resolve){
+                const terms = [];
+                const tokens = input.split(' ');
+                if(tokens.length > 1){
+                    for(let i = 0; i < tokens.length; ++i){
+                        terms.push(tokens[i].toLowerCase());
+                    }
+                }
+                terms.push(input.toLowerCase());
+
+                // This probably can be improved
+                const getAdjacentWords = function(input, index, amount){
+                    let temp = [];
+
+                    let j = index-1;
+                    let c = 0;
+
+                    while(j - 1 >= 0 && c < amount){
+                        temp.push(input[j])
+                        j--;
+                        c++;
+                    }
+
+                    const leftSide = temp.join(' ');
+
+                    j = index+1;
+                    c = 0;    
+                    temp = [];            
+                    while(j < input.length && c < amount){
+                        temp.push(input[j]);
+                        j++;
+                        c++;
+                    }                    
+
+                    const rightSide = temp.join(' ');
+                    return {leftSide, rightSide};
+                };
+                const found = {};
+                for(let j in me.articles){
+                    const article = me.articles[j];
+                    if(article.link == "404") continue;
+                    const lowered = (MiniWikiTools.removeSpecialChars(MiniWikiTools.removeExtraSpaces(article.literal)).toLowerCase() + article.keywords.join(' ').toLowerCase()).split(' ');
+                    for(let i = 0; i < terms.length; ++i){
+                        const term = terms[i];
+                        const index = lowered.indexOf(term);
+                        const words = getAdjacentWords(lowered, index, 5);
+                        if(index != -1){
+                            found[article.link] = {link: article.link, excerpt: {...words, term}};
+                        }
+                    }
+                }
+                me.renderSearch(found, input, me.mainBody);
+            });
+        },
+        renderSearch: function(results, term, target){
+            const me = this;
+            MiniWikiTools.clearElement(target);
+            document.title = `Search '${term}' - ${me.title}`;
+            me.currentArticle = null;
+            me.refreshNavBar();
+            target.style.display = "flex";
+            target.style.flexDirection = "column";
+            target.style.paddingRight = "2rem";
+            target.style.paddingLeft = "2rem";
+            target.style.paddingTop = "2rem";            
+            let html = "";
+            
+            let list = "";
+            for(let i in results){
+                const article = me.articles[results[i].link];
+                const excerpt = results[i].excerpt;
+                list += `
+                    <div style="text-align: left;">
+                        - ${me.generateLink(`${article.title}`, article.link, null)}:
+                        ...<span style="font-style: italic;">
+                            ${excerpt.leftSide}
+                            <span style="font-style: normal; background-color:${me.theme.highlight}; color:${me.theme.bodyBackground};">${excerpt.term}</span>
+                            ${excerpt.rightSide}
+                        </span>...
+                    </div>
+                `;
+            }
+
+            html += `
+                <div style="width: 100%; text-align:center; font-size: 2.5rem;">
+                    Search: '<span style="font-style: italic;">${term}</span>'
+                </div>
+                <div style="width: 100%; text-align:center; font-size: 1.8rem; margin-top: 2rem; margin-left: 8rem; margin-right: 8rem;">
+                    <div style="flex:1"></div>
+                    <div style="width: 60%;">
+                        ${list}    
+                    </div>
+                    <div style="flex:1"></div>
+                </div>
+            `;
+            target.innerHTML = html;
         },
         renderTo: function(target, article, usePreHTML = false){
             const me = this;

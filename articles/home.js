@@ -1,6 +1,10 @@
 miniwiki.registerArticle("Animal Wiki", `
 
-        [!t1 xD]
+        %title label:'Animal Wiki'%
+
+        [!s=5
+            Welcome to the Animal Wiki. This is an example Wiki to test MiniWiki's capabilities.
+        ]
 
     `,
     [
