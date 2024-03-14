@@ -18,6 +18,7 @@ It's a tiny library that offers a couple features that allow the user to create 
 - Tables are possible but have to be built manually
 
 ## TODO:
+- Fix routing when it's being delivered through Github
 - Proper table support
 - SVG support
 - Graph support
