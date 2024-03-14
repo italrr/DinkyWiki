@@ -1,4 +1,4 @@
-miniwiki.registerArticle("Bear Story", `
+dinkywiki.registerArticle("Bear Story", `
 
         %title label:'Bear Story'%
         [!tn=1.5 !s=2 !j

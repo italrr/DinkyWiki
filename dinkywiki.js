@@ -1,9 +1,9 @@
 
-const MINIWIKI_VERSION = [ 0, 0, 0 ];
-const MINIWIKI_RELEASED_DATE = "Jan. 1st, 2024";
+const DINKYWIKI_VERSION = [ 1, 0, 0 ];
+const DINKYWIKI_RELEASED_DATE = "March. 1st, 2024";
 
 
-const MiniWikiTools = {
+const DinkyWikiTools = {
     WIKI_TYPE: {
         TYPICAL: "TYPICAL"          // TYPICAL: It uses a left bar for navigation and main content on the right
     },
@@ -52,7 +52,7 @@ const MiniWikiTools = {
     }
 };
 
-const MiniWiki = function(title, type, theme){
+const DinkyWiki = function(title, type, theme){
     const obj = {
         title,
         body: null,
@@ -86,9 +86,9 @@ const MiniWiki = function(title, type, theme){
         init: function(body){
             const me = this;
             me.body = body;
-            console.log(`MiniWiki v${MINIWIKI_VERSION[0]}.${MINIWIKI_VERSION[1]}.${MINIWIKI_VERSION[2]}`);
+            console.log(`DinkyWiki v${DINKYWIKI_VERSION[0]}.${DINKYWIKI_VERSION[1]}.${DINKYWIKI_VERSION[2]}`);
             
-            miniwiki.registerArticle("404: Not found", `
+            me.registerArticle("404: Not found", `
                     [!tn=2 !s=5 !j
                         [!f][Article not found][!f]
                     ]
@@ -100,6 +100,23 @@ const MiniWiki = function(title, type, theme){
                 "404"
             );
 
+            if(!me.getArticleByLink("home")){
+                me.registerArticle("404: Not found", `
+                        [!tn=2 !s=5 !j
+                            [!f][Default Home Page][!f]
+                        ]
+                        [
+                            This Wiki has no home page yet. This one was generated.
+                        ]
+                    `,
+                    [
+                        "home"
+                    ],
+                    null,
+                    "home"
+                );
+            }
+
             const tbTitle = document.getElementById("tb-title");
             tbTitle.innerHTML = title;
 
@@ -107,20 +124,20 @@ const MiniWiki = function(title, type, theme){
 
             switch(type){
                 default:
-                case MiniWikiTools.WIKI_TYPE.TYPICAL: {
+                case DinkyWikiTools.WIKI_TYPE.TYPICAL: {
                     const main = document.createElement('div');
                     main.style.backgroundColor = "white";
                     main.style.display = "flex";
                     main.style.flexDirection = "row";
                     main.style.width = "100%";
-                    main.style.height = "100vh";
+                    main.style.height = "100%";
+                    main.style.minHeight = "100vh";
 
                     const leftBar = document.createElement('div');
                     leftBar.style.display = "flex";
                     leftBar.style.flexDirection = "row"; 
                     leftBar.style.backgroundColor = theme.navegationBackground;                  
                     leftBar.style.width = "20%";
-                    leftBar.style.height = "100%";
                     main.appendChild(leftBar);
                     me.navMenu = leftBar;
 
@@ -129,7 +146,7 @@ const MiniWiki = function(title, type, theme){
                     mainBody.style.flexDirection = "row"; 
                     mainBody.style.backgroundColor = theme.bodyBackground;                  
                     mainBody.style.flex = "1";
-                    mainBody.style.height = "100%";
+                    // mainBody.style.height = "100%";
                     main.appendChild(mainBody);      
                     me.mainBody = mainBody;          
 
@@ -146,8 +163,12 @@ const MiniWiki = function(title, type, theme){
     
                 const artId = urlParams.get("article");
                 const refAt = urlParams.get("at");
-    
-                me.navigateTo(artId, refAt, skipPush);
+
+                if(!artId){
+                    me.navigateTo("home", null, skipPush);
+                }else{
+                    me.navigateTo(artId, refAt, skipPush);
+                }
             };
 
             refreshNav();
@@ -208,7 +229,7 @@ const MiniWiki = function(title, type, theme){
         refreshNavBar: function(){
             const me = this;
             const target =  me.navMenu;
-            MiniWikiTools.clearElement(target);
+            DinkyWikiTools.clearElement(target);
 
             target.style.display = "flex";
             target.style.flexDirection = "column";
@@ -217,7 +238,7 @@ const MiniWiki = function(title, type, theme){
 
             let html = "";
             // Table of contents
-            if(me.currentArticle && Object.keys(me.currentArticle.sections).length > 0){
+            if(me.currentArticle && Object.keys(me.currentArticle.sections).length > 1){
                 let list = "";
                 let n = 0;
                 for(let i in me.currentArticle.sections){
@@ -276,7 +297,7 @@ const MiniWiki = function(title, type, theme){
                 html +=  
                 `<div style="margin-bottom:3rem;">
                     <div style="font-size: 1.5rem; font-weight: bold; width: 100%; color:${me.theme.navegationBackground}; text-align:center; background-color:${me.theme.textGeneric};">
-                        <div>${me.currentArticle.title.toUpperCase()}</div>
+                        <div>CHILDREN ARTICLES</div>
                     </div>
                     <div style="display: flex; flex-direction:row; margin-top: 1rem;">
                         <div style="flex:1"></div>
@@ -438,7 +459,7 @@ const MiniWiki = function(title, type, theme){
         },
         generateLink: function(label, link, at){
             const url = location.protocol + '//' + location.host + location.pathname;
-            return `<a href="${url}?article=${link}${at ? `&at=${at}` : ''}" onClick="(function(){ miniwiki.navigateTo('${link}', '${at}'); return false; })();return false;" >${label}</a>`;
+            return `<a href="${url}?article=${link}${at ? `&at=${at}` : ''}" onClick="(function(){ dinkywiki.navigateTo('${link}', '${at}'); return false; })();return false;" >${label}</a>`;
         },
         parseToHTML: function(_input, root, defaultBlock = "width:100%; display:flex; flex-direction:row;"){
             const me = this;
@@ -446,7 +467,7 @@ const MiniWiki = function(title, type, theme){
             let j = 0;
             let lastStyleAt = 0;
             let lastChar = "";
-            const input = MiniWikiTools.cleanNewLine(_input);
+            const input = DinkyWikiTools.cleanNewLine(_input);
             if(root){
                 root.sections = {};
             }
@@ -506,7 +527,7 @@ const MiniWiki = function(title, type, theme){
                             str += `${html}</div>`;
                         } break;
                         case "link": {
-                            str += me.generateLink(params.label, params.id);
+                            str += me.generateLink(params.label, params.link);
                             if(root) root.literal += `${params.label} `;
                         } break;
                         case "subtitle":
@@ -520,7 +541,7 @@ const MiniWiki = function(title, type, theme){
                                 currentTitle = params.label;
                             }
                             str += `<div id="${currentTitle.replace(' ', '_')}-${currentSubTitle.replace(' ', '_')}" style="${token == "subtitle" ? 'font-weight:bold;' : `border-bottom: 0.25rem solid ${me.theme.textGeneric};`}">
-                                <div style="font-size: ${fs}rem;">${params.label}</div>
+                                <div style="font-size: ${fs}rem;">${me.parseToHTML(params.label, null, `width:100%; display:inline-block;`)}</div>
                             </div>`;
                             if(root){
                                 if(!root.sections.hasOwnProperty(currentTitle)){
@@ -583,7 +604,31 @@ const MiniWiki = function(title, type, theme){
                         token = input.substring(i+1, eq);
                         param = input.substring(eq+1, l);
                     }
-                    switch(token){
+                    switch(token){  
+                        case 'v': {                         
+                            const toAdd = ` display:flex; flex-direction:column;`;
+                            str = str.substring(0, lastStyleAt+1) + toAdd + str.substring(lastStyleAt);
+                            lastStyleAt += toAdd.length;                            
+                        } break;                         
+                        case 'li': {
+                            let amount = 2;
+                            if(param){
+                                amount = param;
+                            }                                   
+                            const toAdd = ` margin-left:${amount}rem;display:inline-block;`;
+                            str = str.substring(0, lastStyleAt+1) + toAdd + str.substring(lastStyleAt) + '➧<span style="margin-right:0.5rem;"></span> ';
+                            lastStyleAt += toAdd.length;                            
+                        } break;                                          
+                        case 'ct': {                  
+                            const toAdd = ` display:inline-block; text-align:center;`;
+                            str = str.substring(0, lastStyleAt+1) + toAdd + str.substring(lastStyleAt);
+                            lastStyleAt += toAdd.length;
+                        } break;    
+                        case 'bc': {                  
+                            const toAdd = ` background-color: ${param};`;
+                            str = str.substring(0, lastStyleAt+1) + toAdd + str.substring(lastStyleAt);
+                            lastStyleAt += toAdd.length;
+                        } break;                                               
                         case 'i': {
                             const toAdd = " font-style: italic;";
                             str = str.substring(0, lastStyleAt+1) + toAdd + str.substring(lastStyleAt);
@@ -624,10 +669,15 @@ const MiniWiki = function(title, type, theme){
                             lastStyleAt += toAdd.length;
                         } break;                         
                         case 'ul': {
-                            const toAdd = " border-bottom: 0.15rem solid white;";
+                            const toAdd = " text-decoration:underline;";
                             str = str.substring(0, lastStyleAt+1) + toAdd + str.substring(lastStyleAt);
                             lastStyleAt += toAdd.length;
                         } break;   
+                        case 'bl': {
+                            const toAdd = " border-bottom: 0.125rem solid white;";
+                            str = str.substring(0, lastStyleAt+1) + toAdd + str.substring(lastStyleAt);
+                            lastStyleAt += toAdd.length;
+                        } break;                         
                         case 's': {
                             let amount = 1;
                             if(param){
@@ -733,7 +783,7 @@ const MiniWiki = function(title, type, theme){
                 for(let j in me.articles){
                     const article = me.articles[j];
                     if(article.link == "404") continue;
-                    const lowered = (MiniWikiTools.removeSpecialChars(MiniWikiTools.removeExtraSpaces(article.literal)).toLowerCase() + article.keywords.join(' ').toLowerCase()).split(' ');
+                    const lowered = (DinkyWikiTools.removeSpecialChars(DinkyWikiTools.removeExtraSpaces(article.literal)).toLowerCase() + article.keywords.join(' ').toLowerCase()).split(' ');
                     for(let i = 0; i < terms.length; ++i){
                         const term = terms[i];
                         const index = lowered.indexOf(term);
@@ -748,7 +798,7 @@ const MiniWiki = function(title, type, theme){
         },
         renderSearch: function(results, term, target){
             const me = this;
-            MiniWikiTools.clearElement(target);
+            DinkyWikiTools.clearElement(target);
             document.title = `Search '${term}' - ${me.title}`;
             me.currentArticle = null;
             me.refreshNavBar();
@@ -791,7 +841,7 @@ const MiniWiki = function(title, type, theme){
         },
         renderTo: function(target, article, usePreHTML = false){
             const me = this;
-            MiniWikiTools.clearElement(target);
+            DinkyWikiTools.clearElement(target);
             target.style.display = "flex";
             target.style.flexDirection = "column";
             target.style.paddingRight = "2rem";

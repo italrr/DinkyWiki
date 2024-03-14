@@ -1,4 +1,4 @@
-miniwiki.registerArticle("Bird Story", `
+dinkywiki.registerArticle("Bird Story", `
 
         %title label:'Bird Story'%
         [!s=1 %hierarchy full:true%]

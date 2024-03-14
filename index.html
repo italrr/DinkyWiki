@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
     <head id="head">
-        <title>MiniWiki</title>
+        <title>DinkyWiki</title>
 
         <meta charset="UTF-8">
-        <script src="miniwiki.js"></script>
+        <script src="dinkywiki.js"></script>
         <script type="text/javascript">
             
-            const miniwiki = MiniWiki("The Animal Wiki", MiniWikiTools.WIKI_TYPE.TYPICAL, {
+            console.log("test")
+
+            const dinkywiki = DinkyWiki("The Animal Wiki", DinkyWikiTools.WIKI_TYPE.TYPICAL, {
                 topbarbackground: '#201229',
                 navegationBackground: '#1d0c29',
                 bodyBackground: '#0c0c0c',
@@ -17,12 +19,13 @@
     
             // Start Wiki
             setTimeout(() => {
-                miniwiki.registerArticles([
+                dinkywiki.registerArticles([
                     'home',
                     'bear',
-                    'bird'
+                    'bird',
+                    'styling'
                 ]).then(function(){
-                    miniwiki.init(document.getElementById("body"));
+                    dinkywiki.init(document.getElementById("body"));
 
                 });      
                 // Set `enter` key bind for search
@@ -42,7 +45,7 @@
                     alert("Empty query");
                     return;
                 }
-                miniwiki.search(value);
+                dinkywiki.search(value);
             };
 
     
