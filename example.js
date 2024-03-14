@@ -1,5 +1,3 @@
-console.log("test")
-
 const dinkywiki = DinkyWiki("The Animal Wiki", DinkyWikiTools.WIKI_TYPE.TYPICAL, {
     topbarbackground: '#201229',
     navegationBackground: '#1d0c29',
@@ -9,7 +7,7 @@ const dinkywiki = DinkyWiki("The Animal Wiki", DinkyWikiTools.WIKI_TYPE.TYPICAL,
 });
 
 // Start Wiki
-setTimeout(() => {
+setTimeout(function(event){
     console.log("timeout");
     dinkywiki.registerArticles([
         'home',
@@ -21,7 +19,7 @@ setTimeout(() => {
         dinkywiki.init(document.getElementById("body"));
 
     });      
-    console.log(dinkywiki);
+    console.log("end");
     // Set `enter` key bind for search
     const tbSearchBar = document.getElementById('tb-search-input');              
     tbSearchBar.addEventListener("keyup", function(event) {
@@ -30,7 +28,7 @@ setTimeout(() => {
             onSearch();
         }
     });
-}, 500);
+}, 1000);
 
 // Handle search
 const onSearch = function(){
