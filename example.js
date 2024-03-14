@@ -32,8 +32,6 @@ setTimeout(() => {
     });
 }, 500);
 
-debugger
-
 // Handle search
 const onSearch = function(){
     const value = document.getElementById('tb-search-input').value;
