@@ -44,7 +44,6 @@ Some Tokens:
 
 Tricky Tokens:
 - `!f`: It tells the block to automatically occupy a certain amount of empty space within the block. For example: `[!f][HELLO][!f]` will have `HELLO` perfectly centered.
-Another example: `[!f]`.
 - `!v`: It lays the items within this block on a vertical matter, essentially breaking the "one block, one line" convention. This token can be tricky at the beginning, but it does follow a logic can be learned quickly.
 
 All tokens will be properly documented.
