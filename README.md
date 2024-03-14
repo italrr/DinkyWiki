@@ -1,4 +1,4 @@
-# DinkyWiky
+# DinkyWiki
 
 It's a tiny library that offers a couple features that allow the user to create a very simple Wiki without the need of a full fledged hosting server. Articles are defined on JavaScript with a special language formatting called `dinky`.
 
@@ -26,7 +26,7 @@ It's a tiny library that offers a couple features that allow the user to create 
 - Documentation
 
 ## Quick Rundown
-DinkyWiky's language is based on the usage brackets ([]) to organize the content. A single Bracket is a called a block, and it automatically uses the entire line that breaks down to the next line when there's an overflow. 
+DinkyWiki's language is based on the usage brackets ([]) to organize the content. A single Bracket is a called a block, and it automatically uses the entire line that breaks down to the next line when there's an overflow. 
 So, ideally, each parragraph should go in brackets.
 
 ### Styling Tokens
