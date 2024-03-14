@@ -63,24 +63,28 @@ const DinkyWiki = function(title, type, theme){
         articles: {},
         history: [],
         currentArticle: null,
+        manualRegisterArticles: function(list){
+            let loaded = 0;
+            let total = list.length;
+            const head = document.getElementById('head');
+            for(let i = 0; i < list.length; ++i){
+                const script = document.createElement('script');
+                script.onload = function(){
+                    ++loaded;
+                    if(loaded == total){
+                        return;
+                    }
+                };
+                script.setAttribute("type", "text/javascript");
+                script.setAttribute("src", `./articles/${list[i]}.js`);
+                head.appendChild(script);
+            }
+        },
         registerArticles: function(list){
+            const me = this;
             return new Promise(function(resolve){
-                let loaded = 0;
-                let total = list.length;
-                const head = document.getElementById('head');
-                for(let i = 0; i < list.length; ++i){
-                    const script = document.createElement('script');
-                    script.onload = function(){
-                        ++loaded;
-                        if(loaded == total){
-                            resolve();
-                        }
-                    };
-                    script.setAttribute("type", "text/javascript");
-                    script.setAttribute("src", `./articles/${list[i]}.js`);
-                    head.appendChild(script);
-                }
-
+                me.manualRegisterArticles(list);
+                resolve();
             });
         },
         init: function(body){
@@ -742,59 +746,57 @@ const DinkyWiki = function(title, type, theme){
         },
         search: function(input){
             const me = this;
-            return new Promise(function(resolve){
-                const terms = [];
-                const tokens = input.split(' ');
-                if(tokens.length > 1){
-                    for(let i = 0; i < tokens.length; ++i){
-                        terms.push(tokens[i].toLowerCase());
+            const terms = [];
+            const tokens = input.split(' ');
+            if(tokens.length > 1){
+                for(let i = 0; i < tokens.length; ++i){
+                    terms.push(tokens[i].toLowerCase());
+                }
+            }
+            terms.push(input.toLowerCase());
+
+            // This probably can be improved
+            const getAdjacentWords = function(input, index, amount){
+                let temp = [];
+
+                let j = index-1;
+                let c = 0;
+
+                while(j - 1 >= 0 && c < amount){
+                    temp.push(input[j])
+                    j--;
+                    c++;
+                }
+
+                const leftSide = temp.join(' ');
+
+                j = index+1;
+                c = 0;    
+                temp = [];            
+                while(j < input.length && c < amount){
+                    temp.push(input[j]);
+                    j++;
+                    c++;
+                }                    
+
+                const rightSide = temp.join(' ');
+                return {leftSide, rightSide};
+            };
+            const found = {};
+            for(let j in me.articles){
+                const article = me.articles[j];
+                if(article.link == "404") continue;
+                const lowered = (DinkyWikiTools.removeSpecialChars(DinkyWikiTools.removeExtraSpaces(article.literal)).toLowerCase() + article.keywords.join(' ').toLowerCase()).split(' ');
+                for(let i = 0; i < terms.length; ++i){
+                    const term = terms[i];
+                    const index = lowered.indexOf(term);
+                    const words = getAdjacentWords(lowered, index, 5);
+                    if(index != -1){
+                        found[article.link] = {link: article.link, excerpt: {...words, term}};
                     }
                 }
-                terms.push(input.toLowerCase());
-
-                // This probably can be improved
-                const getAdjacentWords = function(input, index, amount){
-                    let temp = [];
-
-                    let j = index-1;
-                    let c = 0;
-
-                    while(j - 1 >= 0 && c < amount){
-                        temp.push(input[j])
-                        j--;
-                        c++;
-                    }
-
-                    const leftSide = temp.join(' ');
-
-                    j = index+1;
-                    c = 0;    
-                    temp = [];            
-                    while(j < input.length && c < amount){
-                        temp.push(input[j]);
-                        j++;
-                        c++;
-                    }                    
-
-                    const rightSide = temp.join(' ');
-                    return {leftSide, rightSide};
-                };
-                const found = {};
-                for(let j in me.articles){
-                    const article = me.articles[j];
-                    if(article.link == "404") continue;
-                    const lowered = (DinkyWikiTools.removeSpecialChars(DinkyWikiTools.removeExtraSpaces(article.literal)).toLowerCase() + article.keywords.join(' ').toLowerCase()).split(' ');
-                    for(let i = 0; i < terms.length; ++i){
-                        const term = terms[i];
-                        const index = lowered.indexOf(term);
-                        const words = getAdjacentWords(lowered, index, 5);
-                        if(index != -1){
-                            found[article.link] = {link: article.link, excerpt: {...words, term}};
-                        }
-                    }
-                }
-                me.renderSearch(found, input, me.mainBody);
-            });
+            }
+            me.renderSearch(found, input, me.mainBody);
         },
         renderSearch: function(results, term, target){
             const me = this;

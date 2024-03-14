@@ -9,22 +9,19 @@ const dinkywiki = DinkyWiki("The Animal Wiki", DinkyWikiTools.WIKI_TYPE.TYPICAL,
 // Start Wiki
 setTimeout(function(event){
     console.log("timeout");
-    dinkywiki.registerArticles([
+    dinkywiki.manualRegisterArticles([
         'home',
         'bear',
         'bird',
         'styling'
-    ]).then(function(){
-        console.log("init");
-        dinkywiki.init(document.getElementById("body"));
-
-    });      
+    ]);
+    dinkywiki.init(document.getElementById("body"));      
     console.log("end");
     // Set `enter` key bind for search
     const tbSearchBar = document.getElementById('tb-search-input');              
     tbSearchBar.addEventListener("keyup", function(event) {
         event.preventDefault();
-        if (event.keyCode === 13) {
+        if (event.keyCode === 13) { // TODO: Fix deprecated code
             onSearch();
         }
     });
