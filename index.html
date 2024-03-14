@@ -7,8 +7,6 @@
         <script src="dinkywiki.js"></script>
         <script>
             
-            console.log("test")
-
             const dinkywiki = DinkyWiki("The Animal Wiki", DinkyWikiTools.WIKI_TYPE.TYPICAL, {
                 topbarbackground: '#201229',
                 navegationBackground: '#1d0c29',
@@ -18,7 +16,7 @@
             });
 
             // Start Wiki
-            setTimeout(() => {
+            window.addEventListener("load", (event) => {
                 console.log("timeout");
                 dinkywiki.registerArticles([
                     'home',
@@ -30,7 +28,7 @@
                     dinkywiki.init(document.getElementById("body"));
 
                 });      
-                console.log(dinkywiki);
+                console.log("end");
                 // Set `enter` key bind for search
                 const tbSearchBar = document.getElementById('tb-search-input');              
                 tbSearchBar.addEventListener("keyup", function(event) {
@@ -39,7 +37,7 @@
                         onSearch();
                     }
                 });
-            }, 500);
+            });
 
             // Handle search
             const onSearch = function(){
