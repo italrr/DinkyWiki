@@ -52,7 +52,7 @@ All tokens will be properly documented.
 Helpers are tools defined within the library that facilitate adding certain types of content. Such as images or video. They follow the next syntax `%<HELPER> PARAMETER:VALUE%`. They act more like inline commands.
 
 Some Helpers:
-- `%title ...%` and `%subtitle%`: They both define a special type heading that also helps DinkyWiky organization articles with the Table of Contents and Search. Params: `label:'VALUE'`.
+- `%title ...%` and `%subtitle%`: They both define a special type heading that also helps DW organize articles with the Table of Contents and Search. Params: `label:'VALUE'`.
 - `%img ...%`: It allows showing an image inline. Params `src:<IMAGE_URL>`.
 - `%video ...%`: It allows showing a video inline. Params `src:<IMAGE_URL>`.
 - `%card-video ...%` and `%card-img ...%`: Both work similar to `%img ...%` and `%video ...%`, but adds a label and frame to the content.
