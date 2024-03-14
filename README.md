@@ -24,6 +24,9 @@ It's a tiny library that offers a couple features that allow the user to create 
 - Improve search functionality
 - Documentation
 
+## Why?
+
+
 ## Quick Rundown
 DinkyWiky's language is based on the usage brackets ([]) to organize the content. A single Bracket is a called a block, and it automatically uses the entire line that breaks down to the next line when there's an overflow. 
 So, ideally, each parragraph should go in brackets.
