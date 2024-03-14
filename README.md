@@ -14,7 +14,7 @@ It's a tiny library that offers a couple features that allow the user to create 
 - Article tags/keywords that make search easier
 - Article linking
 - Article Hierarchy, for better organization
-- Powerful layout functionability based in Flex Boxes
+- Powerful layout functionability based on Flex Boxes
 - Tables are possible but have to be built manually
 
 ## TODO:
@@ -37,7 +37,7 @@ Styling Tokens can receive parameters through the following syntax `!<TOKEN>=<VA
 Some Tokens:
 - `!b`: Bold
 - `!i`: Italics
-- `!i`: Italics
+- `!ul`: Underline
 - `!c=<COLOR>`: It colors the text within this block. `<COLOR>` has to be hexadecimal, or a typical CSS key color. See more [here](https://www.unm.edu/~tbeach/IT145/color.html)
 - `!bc=<COLOR>`: It colors this block's background color. It follows the same format as `!c`.
 - `!tn=<SIZE>`: Changes the block text size in the amount of units by `<SIZE>`.
