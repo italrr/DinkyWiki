@@ -2,7 +2,7 @@
 
 It's a tiny library that offers a couple features that allow the user to create a very simple Wiki without the need of a full fledged hosting server. Articles are defined on JavaScript with a special language formatting called `dinky`.
 
-[Demo](https://htmlpreview.github.io/?https://raw.githubusercontent.com/italrr/DinkyWiky/master/index.html)
+[Demo](https://htmlpreview.github.io/?https://raw.githubusercontent.com/italrr/DinkyWiki/master/index.html)
 
 ## Features
 - All functionality is client side. Only requires the HTML + JS code to be delivered
@@ -18,13 +18,13 @@ It's a tiny library that offers a couple features that allow the user to create 
 - Tables are possible but have to be built manually
 
 ## TODO:
-- Proper interface for tables
+- Proper table support
 - SVG support
 - Graph support
-- Improved search functionality
+- Improve search functionality
 - Documentation
 
-## Quick Run-down
+## Quick Rundown
 DinkyWiky's language is based on the usage brackets ([]) to organize the content. A single Bracket is a called a block, and it automatically uses the entire line that breaks down to the next line when there's an overflow. 
 So, ideally, each parragraph should go in brackets.
 

@@ -19,15 +19,18 @@
     
             // Start Wiki
             setTimeout(() => {
+                console.log("timeout");
                 dinkywiki.registerArticles([
                     'home',
                     'bear',
                     'bird',
                     'styling'
                 ]).then(function(){
+                    console.log("init");
                     dinkywiki.init(document.getElementById("body"));
 
                 });      
+                console.log(dinkywiki);
                 // Set `enter` key bind for search
                 const tbSearchBar = document.getElementById('tb-search-input');              
                 tbSearchBar.addEventListener("keyup", function(event) {
